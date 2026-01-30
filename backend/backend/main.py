@@ -2,11 +2,14 @@ from fastapi import FastAPI, UploadFile, File, Header
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uuid
-import openai
 import io
+import os
 
+from openai import OpenAI
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 
@@ -40,8 +43,7 @@ def start_meeting(x_user: str = Header(...)):
         "transcript": "",
         "summary": "",
         "actions": [],
-        "status": "recording",
-        "shared": False
+        "status": "recording"
     }
     return {"meeting_id": mid}
 
@@ -51,10 +53,10 @@ async def upload_segment(
     file: UploadFile = File(...),
     x_user: str = Header(...)
 ):
-    audio = await file.read()
+    audio_bytes = await file.read()
 
-    transcript = openai.audio.transcriptions.create(
-        file=io.BytesIO(audio),
+    transcript = client.audio.transcriptions.create(
+        file=("audio.webm", audio_bytes),
         model="gpt-4o-transcribe"
     )
 
@@ -65,15 +67,16 @@ async def upload_segment(
 @app.post("/meeting/{mid}/stop")
 def stop_meeting(mid: str, x_user: str = Header(...)):
     prompt = f"""
-Summarize the meeting.
+Summarize this meeting.
 Return:
 1. Summary
-2. Action items (bullet list)
+2. Action items (bullets)
 
 Transcript:
 {MEETINGS[mid]['transcript']}
 """
-    res = openai.chat.completions.create(
+
+    res = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
@@ -86,25 +89,21 @@ Transcript:
     MEETINGS[mid]["status"] = "finished"
     return {"status": "finished"}
 
-@app.get("/meetings")
-def meetings(x_user: str = Header(...)):
-    return [m for m in MEETINGS.values() if m["user"] == x_user]
-
 @app.get("/meeting/{mid}/export/pdf")
 def export_pdf(mid: str):
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
-    text = c.beginText(40, 800)
+    t = c.beginText(40, 800)
 
     m = MEETINGS[mid]
-    text.textLine("ClearNote – Meeting Notes")
-    text.textLine("")
-    text.textLine(m["summary"])
-    text.textLine("")
-    text.textLine("Transcript:")
-    text.textLine(m["transcript"])
+    t.textLine("ClearNote – Meeting Notes")
+    t.textLine("")
+    t.textLine(m["summary"])
+    t.textLine("")
+    t.textLine("Transcript:")
+    t.textLine(m["transcript"])
 
-    c.drawText(text)
+    c.drawText(t)
     c.showPage()
     c.save()
     buf.seek(0)
