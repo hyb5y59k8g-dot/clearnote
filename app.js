@@ -3,6 +3,9 @@ let transcript = [];
 let activeNoteIndex = null;
 let currentTitle = "";
 
+let timerInterval = null;
+let secondsElapsed = 0;
+
 const output = document.getElementById("output");
 const summaryDiv = document.getElementById("summary");
 const speakerSelect = document.getElementById("speaker");
@@ -10,6 +13,9 @@ const speakerSelect = document.getElementById("speaker");
 const startBtn = document.getElementById("start");
 const pauseBtn = document.getElementById("pause");
 const stopBtn = document.getElementById("stop");
+
+const timerEl = document.getElementById("timer");
+const recordDot = document.getElementById("recordDot");
 
 /* ---------- Storage ---------- */
 const getNotes = () => JSON.parse(localStorage.getItem("meetings") || "[]");
@@ -27,6 +33,26 @@ function setDisabled(start, pause, stop) {
   startBtn.disabled = start;
   pauseBtn.disabled = pause;
   stopBtn.disabled = stop;
+}
+
+/* ---------- Timer ---------- */
+function startTimer() {
+  secondsElapsed = 0;
+  timerEl.textContent = "00:00";
+  recordDot.style.display = "inline-block";
+
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const m = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+    const s = String(secondsElapsed % 60).padStart(2, "0");
+    timerEl.textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerEl.textContent = "00:00";
+  recordDot.style.display = "none";
 }
 
 /* ---------- Speech ---------- */
@@ -60,6 +86,7 @@ function renderHistory() {
   list.innerHTML = "";
   getNotes().forEach((n, i) => {
     const li = document.createElement("li");
+    li.classList.toggle("active-note", i === activeNoteIndex);
     li.innerHTML = `
       <span onclick="loadNote(${i})">${n.title}</span>
       <span>
@@ -92,6 +119,7 @@ window.loadNote = i => {
   transcript = n.transcript;
   summaryDiv.textContent = n.summary || "";
   renderTranscript();
+  renderHistory(); // highlight active note
 };
 
 window.renameNote = i => {
@@ -143,6 +171,7 @@ document.getElementById("newNote").onclick = () => {
   activeNoteIndex = null;
   setActive(null);
   setDisabled(false, true, true);
+  stopTimer();
 };
 
 startBtn.onclick = () => {
@@ -150,18 +179,21 @@ startBtn.onclick = () => {
   recognition.start();
   setActive(startBtn);
   setDisabled(true, false, false);
+  startTimer();
 };
 
 pauseBtn.onclick = () => {
   recognition.stop();
   setActive(pauseBtn);
   setDisabled(false, true, false);
+  stopTimer();
 };
 
 stopBtn.onclick = () => {
   recognition.stop();
   setActive(stopBtn);
   setDisabled(false, true, true);
+  stopTimer();
 
   const notes = getNotes();
   notes.push({
@@ -189,7 +221,7 @@ document.getElementById("exportTXT").onclick = () => {
   a.click();
 };
 
-/* ---------- Export PDF (WRAPPED) ---------- */
+/* ---------- Export PDF ---------- */
 document.getElementById("exportPDF").onclick = () => {
   const note = getNotes()[activeNoteIndex];
   if (!note) return;
