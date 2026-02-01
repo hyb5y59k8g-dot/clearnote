@@ -1,0 +1,22 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  margin: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+.controls button {
+  margin: 5px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+#output {
+  margin-top: 15px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 100px;
+  white-space: pre-wrap;
+}
