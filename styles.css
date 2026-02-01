@@ -2,6 +2,7 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
   margin: 0;
   display: flex;
+  flex-direction: column;
   height: 100vh;
 }
 
@@ -9,61 +10,83 @@ header {
   position: sticky;
   top: 0;
   background: #4a90e2;
-  padding: 10px;
   color: #fff;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   z-index: 1000;
 }
 
-header select, header button {
-  margin-right: 8px;
-  padding: 8px 12px;
+.top-bar, .controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px;
+}
+
+.top-bar select, .controls-bar select,
+.top-bar button, .controls-bar button {
+  margin-right: 6px;
+  padding: 6px 10px;
   font-size: 14px;
   border: none;
   border-radius: 4px;
 }
 
-header button {
+.controls-bar button {
   background-color: #50e3c2;
   color: #000;
   cursor: pointer;
 }
 
-#sidebar {
-  width: 200px;
-  background: #f5f7fa;
-  padding: 10px;
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-
-#sidebar h3 {
-  margin-top: 0;
-}
-
-#sidebar li {
-  cursor: pointer;
-  padding: 4px 0;
-  font-size: 14px;
-}
-
-#main {
+main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+#active-meeting {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 #output, #summary {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
   white-space: pre-wrap;
-  border-bottom: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 #summary {
-  background: #f0f8ff;
+  background-color: #f0f8ff;
   font-style: italic;
+}
+
+#saved-meetings {
+  border-top: 1px solid #ccc;
+}
+
+#toggleHistory {
+  width: 100%;
+  padding: 8px;
+  background: #f5f7fa;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: left;
+}
+
+#history {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  transition: max-height 0.3s ease;
+}
+
+#history.collapsed {
+  max-height: 0;
+  padding: 0 10px;
+  overflow: hidden;
 }
