@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ClearNote Pro</title>
+  <title>ClearNote</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <header>
-  <!-- Top Bar -->
   <div class="top-bar">
-    <button id="newMeeting">New Meeting</button>
+    <button id="newNote">New Note</button>
+
     <label>
-      Language:
+      <strong>Language:</strong>
       <select id="language">
         <option value="en-US">English</option>
         <option value="pl-PL">Polish</option>
       </select>
     </label>
+
     <label>
-      Speaker:
+      <strong>Speaker:</strong>
       <select id="speaker">
         <option value="Speaker 1">Speaker 1</option>
         <option value="Speaker 2">Speaker 2</option>
@@ -30,30 +31,33 @@
     </label>
   </div>
 
-  <!-- Controls Bar -->
   <div class="controls-bar">
     <button id="start">Start</button>
     <button id="pause">Pause</button>
     <button id="resume">Resume</button>
     <button id="stop">Stop</button>
-    <button id="summarize">Summarize</button>
     <button id="exportPDF">Export PDF</button>
     <button id="exportTXT">Export TXT</button>
   </div>
 </header>
 
 <main>
-  <!-- Active Meeting -->
-  <section id="active-meeting">
+
+  <!-- Saved Notes -->
+  <section id="saved-meetings">
+    <button id="toggleHistory">Saved Notes ▲</button>
+    <ul id="history"></ul>
+  </section>
+
+  <!-- Active Note -->
+  <section id="active-note">
+    <h3>Transcript</h3>
     <div id="output"></div>
+
+    <h3>Summary</h3>
     <div id="summary"></div>
   </section>
 
-  <!-- Collapsible Saved Meetings -->
-  <section id="saved-meetings">
-    <button id="toggleHistory">Saved Meetings ▼</button>
-    <ul id="history"></ul>
-  </section>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
