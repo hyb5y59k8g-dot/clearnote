@@ -3,35 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ClearNote</title>
+  <title>ClearNote Pro</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <header>
-    <label>
-      Language:
-      <select id="language">
-        <option value="en-US">English</option>
-        <option value="pl-PL">Polish</option>
-      </select>
-    </label>
+<header>
+  <button id="newMeeting">New Meeting</button>
+  <label>
+    Language:
+    <select id="language">
+      <option value="en-US">English</option>
+      <option value="pl-PL">Polish</option>
+    </select>
+  </label>
+  <label>
+    Speaker:
+    <select id="speaker">
+      <option value="Speaker 1">Speaker 1</option>
+      <option value="Speaker 2">Speaker 2</option>
+      <option value="Speaker 3">Speaker 3</option>
+    </select>
+  </label>
+  <button id="start">Start</button>
+  <button id="pause">Pause</button>
+  <button id="resume">Resume</button>
+  <button id="stop">Stop</button>
+  <button id="summarize">Summarize</button>
+  <button id="exportPDF">Export PDF</button>
+  <button id="exportTXT">Export TXT</button>
+</header>
 
-    <button id="start">Start</button>
-    <button id="pause">Pause</button>
-    <button id="resume">Resume</button>
-    <button id="stop">Stop</button>
-    <button id="summarize">Summarize</button>
-  </header>
+<div id="sidebar">
+  <h3>Saved Meetings</h3>
+  <ul id="history"></ul>
+</div>
 
-  <div id="meeting-list">
-    <h3>Saved Meetings</h3>
-    <ul id="history"></ul>
-  </div>
-
+<div id="main">
   <div id="output"></div>
+  <div id="summary"></div>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
