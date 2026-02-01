@@ -2,74 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ClearNote</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+
 <body>
 
 <header>
+  <div class="top-row">
+    <button id="newNote">➕ New Note</button>
 
-  <!-- ROW 1 -->
-  <div class="row row-1">
-    <button id="newNote">New Note</button>
-  </div>
-
-  <!-- ROW 2 -->
-  <div class="row row-2">
-    <label>
-      <strong>Language</strong>
+    <div class="control-group">
+      <label><strong>Language</strong></label>
       <select id="language">
         <option value="en-US">English</option>
         <option value="pl-PL">Polish</option>
       </select>
-    </label>
+    </div>
 
-    <label>
-      <strong>Speaker</strong>
+    <div class="control-group">
+      <label><strong>Speaker</strong></label>
       <select id="speaker">
         <option>Speaker 1</option>
         <option>Speaker 2</option>
         <option>Speaker 3</option>
       </select>
-    </label>
+    </div>
   </div>
 
-  <!-- ROW 3 -->
-  <div class="row row-3">
+  <div class="button-row">
     <button id="start">Start</button>
     <button id="pause">Pause</button>
     <button id="resume">Resume</button>
     <button id="stop">Stop</button>
   </div>
 
-  <!-- ROW 4 -->
-  <div class="row row-4">
-    <button id="exportPDF">Export PDF</button>
+  <div class="button-row">
     <button id="exportTXT">Export TXT</button>
+    <button id="exportPDF">Export PDF</button>
   </div>
-
 </header>
 
 <main>
-
-  <section id="saved-meetings">
-    <button id="toggleHistory">Saved Notes ▲</button>
-    <ul id="history"></ul>
-  </section>
-
-  <section id="active-note">
+  <section class="editor">
     <h3>Transcript</h3>
     <div id="output"></div>
 
     <h3>Summary</h3>
-    <div id="summary"></div>
+    <div id="summary">Summary will appear after recording is stopped.</div>
   </section>
 
+  <section class="history">
+    <details open>
+      <summary><strong>Saved Notes</strong></summary>
+      <ul id="history"></ul>
+    </details>
+
+    <details>
+      <summary><strong>🗑️ Trash</strong></summary>
+      <ul id="trash"></ul>
+    </details>
+  </section>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
