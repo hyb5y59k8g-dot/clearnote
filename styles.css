@@ -71,6 +71,39 @@ main {
   font-weight: bold;
 }
 
+/* Recorder Controls */
+.recorder {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 12px 0;
+}
+
+.rec-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 22px;
+  border: none;
+  background: #e5e5ea;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rec-btn.active {
+  background: #007aff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.4);
+}
+
+.rec-btn:disabled {
+  opacity: 0.4;
+}
+
+/* History */
 .history details {
   background: white;
   border-radius: 12px;
