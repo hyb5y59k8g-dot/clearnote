@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClearNote</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>ClearNote</h1>
+
+  <label>
+    Language:
+    <select id="language">
+      <option value="en-US">English</option>
+      <option value="pl-PL">Polish</option>
+    </select>
+  </label>
+
+  <div class="controls">
+    <button id="start">Start</button>
+    <button id="pause">Pause</button>
+    <button id="resume">Resume</button>
+    <button id="stop">Stop</button>
+  </div>
+
+  <h2>Transcript</h2>
+  <div id="output"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
