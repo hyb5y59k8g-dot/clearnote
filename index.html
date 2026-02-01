@@ -10,6 +10,7 @@
 <body>
 
 <header>
+  <!-- Top Bar -->
   <div class="top-bar">
     <button id="newMeeting">New Meeting</button>
     <label>
@@ -29,6 +30,7 @@
     </label>
   </div>
 
+  <!-- Controls Bar -->
   <div class="controls-bar">
     <button id="start">Start</button>
     <button id="pause">Pause</button>
@@ -41,17 +43,20 @@
 </header>
 
 <main>
+  <!-- Active Meeting -->
   <section id="active-meeting">
     <div id="output"></div>
     <div id="summary"></div>
   </section>
 
+  <!-- Collapsible Saved Meetings -->
   <section id="saved-meetings">
     <button id="toggleHistory">Saved Meetings ▼</button>
-    <ul id="history" class="collapsed"></ul>
+    <ul id="history"></ul>
   </section>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
