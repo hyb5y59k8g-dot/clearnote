@@ -1,16 +1,21 @@
+// ----------------------
+// VARIABLES & DOM
+// ----------------------
 let recognition = null;
 let isPaused = false;
 let currentMeetingTitle = "";
 let currentTranscript = [];
 
-// DOM Elements
 const output = document.getElementById("output");
 const summaryDiv = document.getElementById("summary");
 const languageSelect = document.getElementById("language");
-const historyList = document.getElementById("history");
 const speakerSelect = document.getElementById("speaker");
+const historyList = document.getElementById("history");
+const toggleHistoryBtn = document.getElementById("toggleHistory");
 
-// --- INIT SPEECH RECOGNITION ---
+// ----------------------
+// SPEECH RECOGNITION
+// ----------------------
 function initRecognition() {
   if (recognition) return;
 
@@ -37,11 +42,13 @@ function initRecognition() {
   recognition.onerror = (event) => console.error("Speech recognition error:", event.error);
 
   recognition.onend = () => {
-    if (!isPaused) recognition.start(); // auto-restart
+    if (!isPaused) recognition.start(); // auto-restart for long meetings
   };
 }
 
-// --- BUTTON EVENTS ---
+// ----------------------
+// BUTTON EVENTS
+// ----------------------
 document.getElementById("newMeeting").onclick = () => {
   currentTranscript = [];
   output.textContent = "";
@@ -75,17 +82,18 @@ document.getElementById("stop").onclick = () => {
     isPaused = false;
     recognition.stop();
     recognition = null;
-    saveMeeting();
+    saveMeeting(summaryDiv.textContent);
   }
 };
 
-// --- AI SUMMARY ---
+// ----------------------
+// AI SUMMARIZATION
+// ----------------------
 document.getElementById("summarize").onclick = async () => {
   if (!currentTranscript.length) return;
   summaryDiv.textContent = "Generating summary...";
-  
-  // Example using OpenAI API (replace with your key)
-  const apiKey = "YOUR_OPENAI_API_KEY"; 
+
+  const apiKey = "YOUR_OPENAI_API_KEY"; // replace with your API key
   const text = currentTranscript.join("\n");
 
   try {
@@ -98,7 +106,7 @@ document.getElementById("summarize").onclick = async () => {
       body: JSON.stringify({
         model: "gpt-4",
         messages: [
-          { role: "system", content: "Summarize the following meeting transcript into a clear, concise summary, preserving speaker names." },
+          { role: "system", content: "Summarize the following meeting transcript into a clear, concise, logical summary. Preserve speaker names and organization." },
           { role: "user", content: text }
         ],
         temperature: 0.5
@@ -106,22 +114,26 @@ document.getElementById("summarize").onclick = async () => {
     });
 
     const data = await response.json();
-    summaryDiv.textContent = data.choices[0].message.content.trim();
-    updateMeetingSummary(summaryDiv.textContent);
+    const summary = data.choices[0].message.content.trim();
+    summaryDiv.textContent = summary;
+    updateMeetingSummary(summary);
 
   } catch (err) {
     summaryDiv.textContent = "Error generating summary: " + err;
   }
 };
 
-// --- LOCAL STORAGE ---
+// ----------------------
+// LOCAL STORAGE
+// ----------------------
 function saveMeeting(summary="") {
   if (!currentMeetingTitle || !currentTranscript.length) return;
+
   const meetings = JSON.parse(localStorage.getItem("meetings") || "[]");
   meetings.push({
     title: currentMeetingTitle,
     transcript: currentTranscript.join("\n"),
-    summary: summary || "",
+    summary: summary,
     date: new Date().toISOString()
   });
   localStorage.setItem("meetings", JSON.stringify(meetings));
@@ -135,10 +147,13 @@ function updateMeetingSummary(summary) {
   localStorage.setItem("meetings", JSON.stringify(meetings));
 }
 
+// ----------------------
+// RENDER HISTORY
+// ----------------------
 function renderHistory() {
   const meetings = JSON.parse(localStorage.getItem("meetings") || "[]");
   historyList.innerHTML = "";
-  meetings.forEach((m, idx) => {
+  meetings.forEach((m) => {
     const li = document.createElement("li");
     li.textContent = `${new Date(m.date).toLocaleDateString()} - ${m.title}`;
     li.onclick = () => {
@@ -149,7 +164,19 @@ function renderHistory() {
   });
 }
 
-// --- EXPORT FEATURES ---
+// ----------------------
+// COLLAPSIBLE HISTORY
+// ----------------------
+toggleHistoryBtn.onclick = () => {
+  historyList.classList.toggle("collapsed");
+  toggleHistoryBtn.textContent = historyList.classList.contains("collapsed")
+    ? "Saved Meetings ▼"
+    : "Saved Meetings ▲";
+};
+
+// ----------------------
+// EXPORT FEATURES
+// ----------------------
 document.getElementById("exportTXT").onclick = () => {
   const blob = new Blob([`Title: ${currentMeetingTitle}\n\nTranscript:\n${currentTranscript.join("\n")}\n\nSummary:\n${summaryDiv.textContent}`], {type: "text/plain"});
   const a = document.createElement("a");
@@ -166,10 +193,8 @@ document.getElementById("exportPDF").onclick = async () => {
   doc.text(`Title: ${currentMeetingTitle}`, 10, y);
   y += 10;
   doc.setFontSize(12);
-  doc.text("Transcript:", 10, y);
-  y += 10;
-  const transcriptLines = currentTranscript.join("\n").split("\n");
-  transcriptLines.forEach(line => {
+  doc.text("Transcript:", 10, y); y += 10;
+  currentTranscript.forEach(line => {
     if (y > 280) { doc.addPage(); y = 10; }
     doc.text(line, 10, y); y += 6;
   });
@@ -183,5 +208,7 @@ document.getElementById("exportPDF").onclick = async () => {
   doc.save(`${currentMeetingTitle}.pdf`);
 };
 
-// --- INITIALIZE ---
+// ----------------------
+// INITIALIZE
+// ----------------------
 renderHistory();
