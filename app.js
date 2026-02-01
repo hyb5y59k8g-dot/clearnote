@@ -7,11 +7,27 @@ const output = document.getElementById("output");
 const summaryDiv = document.getElementById("summary");
 const speakerSelect = document.getElementById("speaker");
 
+const startBtn = document.getElementById("start");
+const pauseBtn = document.getElementById("pause");
+const stopBtn = document.getElementById("stop");
+
 /* ---------- Storage ---------- */
 const getNotes = () => JSON.parse(localStorage.getItem("meetings") || "[]");
 const setNotes = n => localStorage.setItem("meetings", JSON.stringify(n));
 const getTrash = () => JSON.parse(localStorage.getItem("trash") || "[]");
 const setTrash = t => localStorage.setItem("trash", JSON.stringify(t));
+
+/* ---------- Recorder UI ---------- */
+function setActive(btn) {
+  [startBtn, pauseBtn, stopBtn].forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+}
+
+function setDisabled(start, pause, stop) {
+  startBtn.disabled = start;
+  pauseBtn.disabled = pause;
+  stopBtn.disabled = stop;
+}
 
 /* ---------- Speech ---------- */
 function initRecognition() {
@@ -125,18 +141,28 @@ document.getElementById("newNote").onclick = () => {
   summaryDiv.textContent = "";
   currentTitle = `Note ${new Date().toLocaleString()}`;
   activeNoteIndex = null;
+  setActive(null);
+  setDisabled(false, true, true);
 };
 
-document.getElementById("start").onclick = () => {
+startBtn.onclick = () => {
   initRecognition();
   recognition.start();
+  setActive(startBtn);
+  setDisabled(true, false, false);
 };
 
-document.getElementById("pause").onclick = () => recognition.stop();
-document.getElementById("resume").onclick = () => recognition.start();
-
-document.getElementById("stop").onclick = () => {
+pauseBtn.onclick = () => {
   recognition.stop();
+  setActive(pauseBtn);
+  setDisabled(false, true, false);
+};
+
+stopBtn.onclick = () => {
+  recognition.stop();
+  setActive(stopBtn);
+  setDisabled(false, true, true);
+
   const notes = getNotes();
   notes.push({
     title: currentTitle,
@@ -163,7 +189,7 @@ document.getElementById("exportTXT").onclick = () => {
   a.click();
 };
 
-/* ---------- Export PDF (FIXED) ---------- */
+/* ---------- Export PDF (WRAPPED) ---------- */
 document.getElementById("exportPDF").onclick = () => {
   const note = getNotes()[activeNoteIndex];
   if (!note) return;
@@ -207,5 +233,6 @@ document.getElementById("exportPDF").onclick = () => {
 };
 
 /* ---------- Init ---------- */
+setDisabled(false, true, true);
 renderHistory();
 renderTrash();
