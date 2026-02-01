@@ -7,7 +7,7 @@ const output = document.getElementById("output");
 const summaryDiv = document.getElementById("summary");
 const speakerSelect = document.getElementById("speaker");
 
-/* ---------- Storage Helpers ---------- */
+/* ---------- Storage ---------- */
 const getNotes = () => JSON.parse(localStorage.getItem("meetings") || "[]");
 const setNotes = n => localStorage.setItem("meetings", JSON.stringify(n));
 const getTrash = () => JSON.parse(localStorage.getItem("trash") || "[]");
@@ -22,16 +22,17 @@ function initRecognition() {
   recognition.onresult = e => {
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
-        const text = e.results[i][0].transcript.trim();
-        const speaker = speakerSelect.value;
-        transcript.push({ speaker, text });
+        transcript.push({
+          speaker: speakerSelect.value,
+          text: e.results[i][0].transcript.trim()
+        });
         renderTranscript();
       }
     }
   };
 }
 
-/* ---------- Rendering ---------- */
+/* ---------- Render ---------- */
 function renderTranscript() {
   output.innerHTML = transcript
     .map(t => `<span class="speaker">${t.speaker}:</span> ${t.text}`)
@@ -70,10 +71,10 @@ function renderTrash() {
 
 /* ---------- Note Actions ---------- */
 window.loadNote = i => {
-  const note = getNotes()[i];
+  const n = getNotes()[i];
   activeNoteIndex = i;
-  transcript = note.transcript;
-  summaryDiv.textContent = note.summary || "";
+  transcript = n.transcript;
+  summaryDiv.textContent = n.summary || "";
   renderTranscript();
 };
 
@@ -140,7 +141,7 @@ document.getElementById("stop").onclick = () => {
   notes.push({
     title: currentTitle,
     transcript,
-    summary: "Summary will be generated later with AI.",
+    summary: "",
     date: new Date().toISOString()
   });
   setNotes(notes);
@@ -148,7 +149,7 @@ document.getElementById("stop").onclick = () => {
   renderHistory();
 };
 
-/* ---------- Export ---------- */
+/* ---------- Export TXT ---------- */
 document.getElementById("exportTXT").onclick = () => {
   const n = getNotes()[activeNoteIndex];
   if (!n) return;
@@ -162,19 +163,47 @@ document.getElementById("exportTXT").onclick = () => {
   a.click();
 };
 
+/* ---------- Export PDF (FIXED) ---------- */
 document.getElementById("exportPDF").onclick = () => {
-  const n = getNotes()[activeNoteIndex];
-  if (!n) return;
+  const note = getNotes()[activeNoteIndex];
+  if (!note) return;
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  let y = 10;
-  doc.text(n.title, 10, y);
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 12;
+  const maxWidth = pageWidth - margin * 2;
+  let y = margin;
+
+  doc.setFontSize(16);
+  doc.text(note.title, margin, y);
   y += 10;
-  n.transcript.forEach(t => {
-    doc.text(`${t.speaker}: ${t.text}`, 10, y);
-    y += 6;
+
+  doc.setFontSize(10);
+  doc.text(new Date(note.date).toLocaleString(), margin, y);
+  y += 10;
+
+  doc.setFontSize(13);
+  doc.text("Transcript", margin, y);
+  y += 8;
+
+  doc.setFontSize(11);
+
+  note.transcript.forEach(t => {
+    const lines = doc.splitTextToSize(`${t.speaker}: ${t.text}`, maxWidth);
+    lines.forEach(line => {
+      if (y > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += 6;
+    });
   });
-  doc.save(`${n.title}.pdf`);
+
+  doc.save(`${note.title}.pdf`);
 };
 
 /* ---------- Init ---------- */
