@@ -19,7 +19,7 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 8px;
   flex-wrap: wrap;
 }
@@ -31,9 +31,9 @@ header {
 }
 
 select, button {
-  padding: 8px 12px;
+  padding: 8px 14px;
   font-size: 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
 }
 
@@ -48,23 +48,21 @@ button:hover {
 }
 
 main {
-  display: flex;
-  flex-direction: column;
   padding: 10px;
 }
 
 .editor {
   background: white;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 14px;
 }
 
 #output, #summary {
-  min-height: 120px;
-  padding: 8px;
+  min-height: 140px;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   white-space: pre-wrap;
   overflow-y: auto;
 }
@@ -75,9 +73,9 @@ main {
 
 .history details {
   background: white;
-  border-radius: 10px;
-  padding: 8px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 12px;
 }
 
 .history ul {
