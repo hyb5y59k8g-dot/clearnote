@@ -10,40 +10,47 @@
 <body>
 
 <header>
-  <button id="newMeeting">New Meeting</button>
-  <label>
-    Language:
-    <select id="language">
-      <option value="en-US">English</option>
-      <option value="pl-PL">Polish</option>
-    </select>
-  </label>
-  <label>
-    Speaker:
-    <select id="speaker">
-      <option value="Speaker 1">Speaker 1</option>
-      <option value="Speaker 2">Speaker 2</option>
-      <option value="Speaker 3">Speaker 3</option>
-    </select>
-  </label>
-  <button id="start">Start</button>
-  <button id="pause">Pause</button>
-  <button id="resume">Resume</button>
-  <button id="stop">Stop</button>
-  <button id="summarize">Summarize</button>
-  <button id="exportPDF">Export PDF</button>
-  <button id="exportTXT">Export TXT</button>
+  <div class="top-bar">
+    <button id="newMeeting">New Meeting</button>
+    <label>
+      Language:
+      <select id="language">
+        <option value="en-US">English</option>
+        <option value="pl-PL">Polish</option>
+      </select>
+    </label>
+    <label>
+      Speaker:
+      <select id="speaker">
+        <option value="Speaker 1">Speaker 1</option>
+        <option value="Speaker 2">Speaker 2</option>
+        <option value="Speaker 3">Speaker 3</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="controls-bar">
+    <button id="start">Start</button>
+    <button id="pause">Pause</button>
+    <button id="resume">Resume</button>
+    <button id="stop">Stop</button>
+    <button id="summarize">Summarize</button>
+    <button id="exportPDF">Export PDF</button>
+    <button id="exportTXT">Export TXT</button>
+  </div>
 </header>
 
-<div id="sidebar">
-  <h3>Saved Meetings</h3>
-  <ul id="history"></ul>
-</div>
+<main>
+  <section id="active-meeting">
+    <div id="output"></div>
+    <div id="summary"></div>
+  </section>
 
-<div id="main">
-  <div id="output"></div>
-  <div id="summary"></div>
-</div>
+  <section id="saved-meetings">
+    <button id="toggleHistory">Saved Meetings ▼</button>
+    <ul id="history" class="collapsed"></ul>
+  </section>
+</main>
 
 <script src="app.js"></script>
 </body>
