@@ -1,1 +1,8 @@
-
+{
+  "name": "ClearNote",
+  "short_name": "ClearNote",
+  "display": "standalone",
+  "start_url": ".",
+  "theme_color": "#007aff",
+  "background_color": "#ffffff"
+}
