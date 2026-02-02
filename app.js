@@ -27,12 +27,12 @@ function setupRecognition() {
   recognition.continuous = true;
   recognition.interimResults = false;
 
-  recognition.onresult = event => {
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
+  recognition.onresult = e => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
         transcript.push({
           speaker: speakerSelect.value,
-          text: event.results[i][0].transcript.trim()
+          text: e.results[i][0].transcript.trim()
         });
         renderTranscript();
       }
@@ -41,7 +41,7 @@ function setupRecognition() {
 
   recognition.onend = () => {
     if (!isRecording && transcript.length > 0) {
-      persistNote();
+      saveNote();
     }
   };
 }
@@ -49,16 +49,14 @@ function setupRecognition() {
 /* ---------- RECORDING ---------- */
 function startRecording() {
   if (isRecording) return;
-
   setupRecognition();
   recognition.start();
   isRecording = true;
-
   startBtn.classList.add("active");
 }
 
 function pauseRecording() {
-  if (!isRecording || !recognition) return;
+  if (!isRecording) return;
   isRecording = false;
   recognition.stop();
   startBtn.classList.remove("active");
@@ -72,23 +70,24 @@ function stopRecording() {
 }
 
 /* ---------- NOTES ---------- */
-function persistNote() {
+function saveNote() {
   const notes = getNotes();
   notes.push({
     title: `Note ${new Date().toLocaleString()}`,
-    transcript: [...transcript]
+    transcript: JSON.parse(JSON.stringify(transcript)) // deep copy
   });
-
   setNotes(notes);
   transcript = [];
   output.innerHTML = "";
+  activeNoteIndex = null;
   renderAll();
 }
 
 function openNote(index) {
   const notes = getNotes();
+  if (!notes[index]) return;
   activeNoteIndex = index;
-  transcript = [...notes[index].transcript];
+  transcript = JSON.parse(JSON.stringify(notes[index].transcript));
   renderTranscript();
   renderAll();
 }
@@ -106,13 +105,10 @@ function renameNote(index) {
 function deleteNote(index) {
   const notes = getNotes();
   const trash = getTrash();
-
   trash.push(notes[index]);
   notes.splice(index, 1);
-
   setTrash(trash);
   setNotes(notes);
-
   activeNoteIndex = null;
   output.innerHTML = "";
   renderAll();
@@ -122,10 +118,8 @@ function deleteNote(index) {
 function restoreFromTrash(index) {
   const trash = getTrash();
   const notes = getNotes();
-
   notes.push(trash[index]);
   trash.splice(index, 1);
-
   setTrash(trash);
   setNotes(notes);
   renderAll();
@@ -156,7 +150,12 @@ function renderNotes() {
 
   notes.forEach((note, index) => {
     const li = document.createElement("li");
-    li.className = index === activeNoteIndex ? "selected-note" : "";
+    li.style.padding = "8px";
+    li.style.marginBottom = "6px";
+    li.style.borderRadius = "8px";
+    li.style.background =
+      index === activeNoteIndex ? "#e8f0ff" : "transparent";
+
     li.innerHTML = `
       <strong>${note.title}</strong><br>
       <button onclick="openNote(${index})">Open</button>
@@ -172,15 +171,21 @@ function renderTrash() {
   if (!trashSection) {
     trashSection = document.createElement("div");
     trashSection.id = "trash-section";
-    trashSection.innerHTML = "<h3>Trash</h3>";
-    historyList.parentElement.appendChild(trashSection);
+    trashSection.style.marginTop = "20px";
+    historyList.after(trashSection);
   }
 
-  trashSection.innerHTML = "<h3>Trash</h3>";
   const trash = getTrash();
+  trashSection.innerHTML = "<h3>Trash</h3>";
+
+  if (trash.length === 0) {
+    trashSection.innerHTML += "<em>Trash is empty</em>";
+    return;
+  }
 
   trash.forEach((note, index) => {
     const div = document.createElement("div");
+    div.style.marginBottom = "6px";
     div.innerHTML = `
       ${note.title}
       <button onclick="restoreFromTrash(${index})">Restore</button>
