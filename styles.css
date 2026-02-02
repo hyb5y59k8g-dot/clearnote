@@ -10,19 +10,16 @@ header {
   background: white;
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  z-index: 1000;
 }
 
-.top-row {
+.top-controls {
   display: flex;
-  justify-content: center;
-  align-items: center;
   gap: 12px;
+  align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 8px;
 }
 
-.control-group {
+.control {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,24 +27,21 @@ header {
 
 button, select {
   padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  border-radius: 12px;
+  border: none;
   font-size: 14px;
 }
 
-button {
+button.primary {
   background: #007aff;
   color: white;
-  border: none;
 }
 
-/* Recorder */
 .recorder {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 18px;
-  margin: 10px 0;
+  gap: 14px;
+  margin-top: 10px;
 }
 
 .rec-btn {
@@ -55,91 +49,72 @@ button {
   height: 54px;
   border-radius: 50%;
   background: #e5e5ea;
-  border: none;
   font-size: 22px;
+  transition: all 0.15s ease;
 }
 
 .rec-btn.active {
   background: #007aff;
   color: white;
+  box-shadow: 0 0 0 4px rgba(0,122,255,0.2);
 }
 
-.rec-btn:disabled {
-  opacity: 0.4;
+.rec-btn:active {
+  transform: scale(0.95);
 }
 
-/* Timer */
-#timer-container {
+.status {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 16px;
 }
 
-#recordDot {
-  width: 12px;
-  height: 12px;
+.dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: red;
-  display: none;
+  opacity: 0;
+}
+
+.dot.recording {
+  opacity: 1;
   animation: blink 1s infinite;
 }
 
 @keyframes blink {
-  0%,100% { opacity: 1 }
   50% { opacity: 0 }
 }
 
-/* Main */
 main {
-  padding: 10px;
+  padding: 12px;
 }
 
-/* Cards */
-.card {
+.panel {
   background: white;
   border-radius: 14px;
   padding: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.card-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.card-actions button {
-  background: #f0f0f5;
-  color: #007aff;
-  font-size: 13px;
-}
-
-/* Content */
-.content-box {
+.box {
   min-height: 120px;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 10px;
-  white-space: pre-wrap;
-}
-
-.speaker {
-  font-weight: bold;
-}
-
-/* History */
-ul {
-  list-style: none;
-  padding: 0;
 }
 
 li {
-  margin: 6px 0;
+  list-style: none;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+li.active {
+  background: #e8f0ff;
+}
+
+li button {
+  margin-right: 6px;
 }
