@@ -1,27 +1,29 @@
 let recognition = null;
-let isRecording = false;
-let transcript = [];
-let activeNoteIndex = null;
+let recording = false;
+let buffer = [];
+let activeIndex = null;
 
-/* ---------- ELEMENTS ---------- */
 const output = document.getElementById("output");
-const historyList = document.getElementById("history");
+const notesList = document.getElementById("notesList");
+const trashList = document.getElementById("trashList");
 const speakerSelect = document.getElementById("speaker");
 const languageSelect = document.getElementById("language");
 
 const startBtn = document.getElementById("start");
 const pauseBtn = document.getElementById("pause");
 const stopBtn = document.getElementById("stop");
+const dot = document.querySelector(".dot");
+const statusText = document.getElementById("statusText");
 
 /* ---------- STORAGE ---------- */
-const getNotes = () => JSON.parse(localStorage.getItem("notes") || "[]");
-const setNotes = notes => localStorage.setItem("notes", JSON.stringify(notes));
+const notes = () => JSON.parse(localStorage.getItem("notes") || "[]");
+const trash = () => JSON.parse(localStorage.getItem("trash") || "[]");
 
-const getTrash = () => JSON.parse(localStorage.getItem("trash") || "[]");
-const setTrash = trash => localStorage.setItem("trash", JSON.stringify(trash));
+const saveNotes = n => localStorage.setItem("notes", JSON.stringify(n));
+const saveTrash = t => localStorage.setItem("trash", JSON.stringify(t));
 
 /* ---------- SPEECH ---------- */
-function setupRecognition() {
+function initRecognition() {
   recognition = new webkitSpeechRecognition();
   recognition.lang = languageSelect.value;
   recognition.continuous = true;
@@ -30,7 +32,7 @@ function setupRecognition() {
   recognition.onresult = e => {
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
-        transcript.push({
+        buffer.push({
           speaker: speakerSelect.value,
           text: e.results[i][0].transcript.trim()
         });
@@ -40,103 +42,122 @@ function setupRecognition() {
   };
 
   recognition.onend = () => {
-    if (!isRecording && transcript.length > 0) {
-      saveNote();
+    if (!recording && buffer.length) {
+      persistNote();
     }
   };
 }
 
 /* ---------- RECORDING ---------- */
-function startRecording() {
-  if (isRecording) return;
-  setupRecognition();
+function start() {
+  if (recording) return;
+  buffer = [];
+  initRecognition();
   recognition.start();
-  isRecording = true;
+  recording = true;
   startBtn.classList.add("active");
+  dot.classList.add("recording");
+  statusText.textContent = "Recording";
 }
 
-function pauseRecording() {
-  if (!isRecording) return;
-  isRecording = false;
+function pause() {
+  if (!recording) return;
+  recording = false;
   recognition.stop();
   startBtn.classList.remove("active");
+  dot.classList.remove("recording");
+  statusText.textContent = "Paused";
 }
 
-function stopRecording() {
+function stop() {
   if (!recognition) return;
-  isRecording = false;
+  recording = false;
   recognition.stop();
   startBtn.classList.remove("active");
+  dot.classList.remove("recording");
+  statusText.textContent = "Saved";
 }
 
 /* ---------- NOTES ---------- */
-function saveNote() {
-  const notes = getNotes();
-  notes.push({
+function persistNote() {
+  const all = notes();
+  all.push({
     title: `Note ${new Date().toLocaleString()}`,
-    transcript: JSON.parse(JSON.stringify(transcript)) // deep copy
+    transcript: JSON.parse(JSON.stringify(buffer))
   });
-  setNotes(notes);
-  transcript = [];
-  output.innerHTML = "";
-  activeNoteIndex = null;
+  saveNotes(all);
+  buffer = [];
   renderAll();
 }
 
-function openNote(index) {
-  const notes = getNotes();
-  if (!notes[index]) return;
-  activeNoteIndex = index;
-  transcript = JSON.parse(JSON.stringify(notes[index].transcript));
+function openNote(i) {
+  activeIndex = i;
+  buffer = JSON.parse(JSON.stringify(notes()[i].transcript));
   renderTranscript();
-  renderAll();
+  renderNotes();
 }
 
-function renameNote(index) {
-  const notes = getNotes();
-  const name = prompt("Rename note:", notes[index].title);
-  if (name) {
-    notes[index].title = name;
-    setNotes(notes);
-    renderAll();
-  }
-}
-
-function deleteNote(index) {
-  const notes = getNotes();
-  const trash = getTrash();
-  trash.push(notes[index]);
-  notes.splice(index, 1);
-  setTrash(trash);
-  setNotes(notes);
-  activeNoteIndex = null;
+function deleteNote(i) {
+  const all = notes();
+  const t = trash();
+  t.push(all[i]);
+  all.splice(i, 1);
+  saveNotes(all);
+  saveTrash(t);
+  activeIndex = null;
   output.innerHTML = "";
   renderAll();
 }
 
-/* ---------- TRASH ---------- */
-function restoreFromTrash(index) {
-  const trash = getTrash();
-  const notes = getNotes();
-  notes.push(trash[index]);
-  trash.splice(index, 1);
-  setTrash(trash);
-  setNotes(notes);
+function restoreTrash(i) {
+  const all = notes();
+  const t = trash();
+  all.push(t[i]);
+  t.splice(i, 1);
+  saveNotes(all);
+  saveTrash(t);
   renderAll();
 }
 
-function deleteForever(index) {
-  const trash = getTrash();
-  trash.splice(index, 1);
-  setTrash(trash);
-  renderAll();
+function deleteForever(i) {
+  const t = trash();
+  t.splice(i, 1);
+  saveTrash(t);
+  renderTrash();
 }
 
 /* ---------- RENDER ---------- */
 function renderTranscript() {
-  output.innerHTML = transcript
-    .map(t => `<b>${t.speaker}:</b> ${t.text}`)
+  output.innerHTML = buffer
+    .map(l => `<b>${l.speaker}:</b> ${l.text}`)
     .join("<br>");
+}
+
+function renderNotes() {
+  notesList.innerHTML = "";
+  notes().forEach((n, i) => {
+    const li = document.createElement("li");
+    li.className = i === activeIndex ? "active" : "";
+    li.innerHTML = `
+      <strong>${n.title}</strong><br>
+      <button onclick="openNote(${i})">Open</button>
+      <button onclick="deleteNote(${i})">🗑</button>
+    `;
+    notesList.appendChild(li);
+  });
+}
+
+function renderTrash() {
+  trashList.innerHTML = "";
+  trash().forEach((n, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${n.title}<br>
+      <button onclick="restoreTrash(${i})">Restore</button>
+      <button onclick="deleteForever(${i})">Delete Forever</button>
+    `;
+    trashList.appendChild(li);
+  });
 }
 
 function renderAll() {
@@ -144,70 +165,20 @@ function renderAll() {
   renderTrash();
 }
 
-function renderNotes() {
-  historyList.innerHTML = "";
-  const notes = getNotes();
-
-  notes.forEach((note, index) => {
-    const li = document.createElement("li");
-    li.style.padding = "8px";
-    li.style.marginBottom = "6px";
-    li.style.borderRadius = "8px";
-    li.style.background =
-      index === activeNoteIndex ? "#e8f0ff" : "transparent";
-
-    li.innerHTML = `
-      <strong>${note.title}</strong><br>
-      <button onclick="openNote(${index})">Open</button>
-      <button onclick="renameNote(${index})">Edit</button>
-      <button onclick="deleteNote(${index})">🗑</button>
-    `;
-    historyList.appendChild(li);
-  });
-}
-
-function renderTrash() {
-  let trashSection = document.getElementById("trash-section");
-  if (!trashSection) {
-    trashSection = document.createElement("div");
-    trashSection.id = "trash-section";
-    trashSection.style.marginTop = "20px";
-    historyList.after(trashSection);
-  }
-
-  const trash = getTrash();
-  trashSection.innerHTML = "<h3>Trash</h3>";
-
-  if (trash.length === 0) {
-    trashSection.innerHTML += "<em>Trash is empty</em>";
-    return;
-  }
-
-  trash.forEach((note, index) => {
-    const div = document.createElement("div");
-    div.style.marginBottom = "6px";
-    div.innerHTML = `
-      ${note.title}
-      <button onclick="restoreFromTrash(${index})">Restore</button>
-      <button onclick="deleteForever(${index})">Delete Forever</button>
-    `;
-    trashSection.appendChild(div);
-  });
-}
-
 /* ---------- NEW NOTE ---------- */
 document.getElementById("newNote").onclick = () => {
-  transcript = [];
+  buffer = [];
   output.innerHTML = "";
-  activeNoteIndex = null;
+  activeIndex = null;
   speakerSelect.value = "Speaker 1";
-  renderAll();
+  statusText.textContent = "Idle";
+  renderNotes();
 };
 
-/* ---------- BUTTONS ---------- */
-startBtn.onclick = startRecording;
-pauseBtn.onclick = pauseRecording;
-stopBtn.onclick = stopRecording;
+/* ---------- EVENTS ---------- */
+startBtn.onclick = start;
+pauseBtn.onclick = pause;
+stopBtn.onclick = stop;
 
 /* ---------- INIT ---------- */
 renderAll();
