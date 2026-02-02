@@ -4,18 +4,16 @@
   <meta charset="UTF-8" />
   <title>ClearNote</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
 
 <header>
-  <div class="top-row">
-    <button id="newNote">➕ New Note</button>
+  <div class="top-controls">
+    <button id="newNote" class="primary">➕ New Note</button>
 
-    <div class="control-group">
+    <div class="control">
       <label><strong>Language</strong></label>
       <select id="language">
         <option value="en-US">English</option>
@@ -23,7 +21,7 @@
       </select>
     </div>
 
-    <div class="control-group">
+    <div class="control">
       <label><strong>Speaker</strong></label>
       <select id="speaker">
         <option>Speaker 1</option>
@@ -33,53 +31,32 @@
     </div>
   </div>
 
-  <!-- Recorder -->
   <div class="recorder">
     <button id="start" class="rec-btn">▶︎</button>
-    <button id="pause" class="rec-btn" disabled>⏸</button>
-    <button id="stop" class="rec-btn" disabled>⏺</button>
-
-    <div id="timer-container">
-      <span id="recordDot"></span>
-      <span id="timer">00:00</span>
+    <button id="pause" class="rec-btn">⏸</button>
+    <button id="stop" class="rec-btn">⏺</button>
+    <div class="status">
+      <span class="dot"></span>
+      <span id="statusText">Idle</span>
     </div>
   </div>
 </header>
 
 <main>
 
-  <!-- Transcript Section -->
-  <section class="card">
-    <div class="card-header">
-      <h3>Transcript</h3>
-      <div class="card-actions">
-        <button id="copyTranscript">📋 Copy</button>
-        <button id="exportTranscriptTXT">⬇️ TXT</button>
-        <button id="exportTranscriptPDF">📄 PDF</button>
-      </div>
-    </div>
-    <div id="output" class="content-box"></div>
+  <section class="panel">
+    <h3>Transcript</h3>
+    <div id="output" class="box"></div>
   </section>
 
-  <!-- Summary Section -->
-  <section class="card">
-    <div class="card-header">
-      <h3>Summary</h3>
-      <div class="card-actions">
-        <button id="copySummary">📋 Copy</button>
-        <button id="exportSummaryTXT">⬇️ TXT</button>
-        <button id="exportSummaryPDF">📄 PDF</button>
-      </div>
-    </div>
-    <div id="summary" class="content-box"></div>
+  <section class="panel">
+    <h3>Saved Notes</h3>
+    <ul id="notesList"></ul>
   </section>
 
-  <!-- History -->
-  <section class="card">
-    <details open>
-      <summary><strong>Saved Notes</strong></summary>
-      <ul id="history"></ul>
-    </details>
+  <section class="panel">
+    <h3>Trash</h3>
+    <ul id="trashList"></ul>
   </section>
 
 </main>
