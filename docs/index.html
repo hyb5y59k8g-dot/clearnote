@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ClearNote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
+<body>
+
+<header>
+  <div class="top-controls">
+    <button id="newNote" class="primary">➕ New Note</button>
+
+    <div class="control">
+      <label><strong>Language</strong></label>
+      <select id="language">
+        <option value="en-US">English</option>
+        <option value="pl-PL">Polish</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label><strong>Speaker</strong></label>
+      <select id="speaker">
+        <option>Speaker 1</option>
+        <option>Speaker 2</option>
+        <option>Speaker 3</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="recorder">
+    <button id="start" class="rec-btn">▶︎</button>
+    <button id="pause" class="rec-btn">⏸</button>
+    <button id="stop" class="rec-btn">⏺</button>
+    <div class="status">
+      <span class="dot"></span>
+      <span id="statusText">Idle</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="panel">
+    <h3>Transcript</h3>
+    <div id="output" class="box"></div>
+  </section>
+
+  <section class="panel">
+    <h3>Saved Notes</h3>
+    <ul id="notesList"></ul>
+  </section>
+
+  <section class="panel">
+    <h3>Trash</h3>
+    <ul id="trashList"></ul>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
