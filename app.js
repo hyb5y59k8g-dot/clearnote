@@ -1,8 +1,9 @@
-let recognition;
+let recognition = null;
 let isRecording = false;
 let transcript = [];
 let activeNoteIndex = null;
 
+/* ---------- ELEMENTS ---------- */
 const output = document.getElementById("output");
 const historyList = document.getElementById("history");
 const speakerSelect = document.getElementById("speaker");
@@ -36,6 +37,12 @@ function setupRecognition() {
   };
 
   recognition.onerror = () => stopRecording();
+
+  recognition.onend = () => {
+    if (!isRecording && transcript.length > 0) {
+      persistNote();
+    }
+  };
 }
 
 /* ---------- RECORDING ---------- */
@@ -52,30 +59,28 @@ function startRecording() {
 }
 
 function pauseRecording() {
-  if (!isRecording) return;
-  recognition.stop();
+  if (!isRecording || !recognition) return;
+
   isRecording = false;
+  recognition.stop();
   startBtn.classList.remove("active");
 }
 
 function stopRecording() {
   if (!recognition) return;
 
-  recognition.stop();
   isRecording = false;
+  recognition.stop();
   startBtn.classList.remove("active");
-
-  saveNote();
 }
 
 /* ---------- NOTES ---------- */
-function saveNote() {
-  if (transcript.length === 0) return;
-
+function persistNote() {
   const notes = getNotes();
+
   notes.push({
     title: `Note ${new Date().toLocaleString()}`,
-    transcript
+    transcript: [...transcript]
   });
 
   setNotes(notes);
@@ -107,8 +112,10 @@ function renderHistory() {
 
 function openNote(index) {
   const notes = getNotes();
+  if (!notes[index]) return;
+
   activeNoteIndex = index;
-  transcript = notes[index].transcript;
+  transcript = [...notes[index].transcript];
   renderTranscript();
   renderHistory();
 }
