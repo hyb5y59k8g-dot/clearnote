@@ -33,43 +33,55 @@
     </div>
   </div>
 
-  <!-- Recorder Controls + Timer -->
+  <!-- Recorder -->
   <div class="recorder">
-    <button id="start" class="rec-btn play">▶︎</button>
-    <button id="pause" class="rec-btn pause" disabled>⏸</button>
-    <button id="stop" class="rec-btn stop" disabled>⏺</button>
+    <button id="start" class="rec-btn">▶︎</button>
+    <button id="pause" class="rec-btn" disabled>⏸</button>
+    <button id="stop" class="rec-btn" disabled>⏺</button>
+
     <div id="timer-container">
       <span id="recordDot"></span>
       <span id="timer">00:00</span>
     </div>
   </div>
-
-  <div class="button-row">
-    <button id="exportTXT">Export TXT</button>
-    <button id="exportPDF">Export PDF</button>
-  </div>
 </header>
 
 <main>
-  <section class="editor">
-    <h3>Transcript</h3>
-    <div id="output"></div>
 
-    <h3>Summary</h3>
-    <div id="summary">Summary will appear here later.</div>
+  <!-- Transcript Section -->
+  <section class="card">
+    <div class="card-header">
+      <h3>Transcript</h3>
+      <div class="card-actions">
+        <button id="copyTranscript">📋 Copy</button>
+        <button id="exportTranscriptTXT">⬇️ TXT</button>
+        <button id="exportTranscriptPDF">📄 PDF</button>
+      </div>
+    </div>
+    <div id="output" class="content-box"></div>
   </section>
 
-  <section class="history">
+  <!-- Summary Section -->
+  <section class="card">
+    <div class="card-header">
+      <h3>Summary</h3>
+      <div class="card-actions">
+        <button id="copySummary">📋 Copy</button>
+        <button id="exportSummaryTXT">⬇️ TXT</button>
+        <button id="exportSummaryPDF">📄 PDF</button>
+      </div>
+    </div>
+    <div id="summary" class="content-box"></div>
+  </section>
+
+  <!-- History -->
+  <section class="card">
     <details open>
       <summary><strong>Saved Notes</strong></summary>
       <ul id="history"></ul>
     </details>
-
-    <details>
-      <summary><strong>🗑️ Trash</strong></summary>
-      <ul id="trash"></ul>
-    </details>
   </section>
+
 </main>
 
 <script src="app.js"></script>
