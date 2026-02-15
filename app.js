@@ -1,3 +1,4 @@
+/* ---------------------- VARIABLES ---------------------- */
 let recognition = null;
 let recording = false;
 let buffer = "";
@@ -15,13 +16,13 @@ const recordBtn = document.getElementById("recordBtn");
 const dot = document.getElementById("recordDot");
 const timerEl = document.getElementById("timer");
 
-/* ---------- STORAGE ---------- */
+/* ---------------------- STORAGE ---------------------- */
 const notes = () => JSON.parse(localStorage.getItem("notes") || "[]");
 const trash = () => JSON.parse(localStorage.getItem("trash") || "[]");
 const saveNotes = n => localStorage.setItem("notes", JSON.stringify(n));
 const saveTrash = t => localStorage.setItem("trash", JSON.stringify(t));
 
-/* ---------- TIMER ---------- */
+/* ---------------------- TIMER ---------------------- */
 function startTimer() {
   seconds = 0;
   timerEl.textContent = "00:00";
@@ -37,7 +38,7 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-/* ---------- SPEECH ---------- */
+/* ---------------------- SPEECH RECOGNITION ---------------------- */
 function initRecognition() {
   const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechAPI();
@@ -75,7 +76,7 @@ function initRecognition() {
   };
 }
 
-/* ---------- RECORD TOGGLE ---------- */
+/* ---------------------- RECORD BUTTON ---------------------- */
 function toggleRecording() {
   if (!recording) {
     buffer = "";
@@ -101,7 +102,7 @@ function toggleRecording() {
   }
 }
 
-/* ---------- NOTES ---------- */
+/* ---------------------- NOTES MANAGEMENT ---------------------- */
 function persistNote() {
   const all = notes();
   all.push({
@@ -110,6 +111,7 @@ function persistNote() {
   });
   saveNotes(all);
   activeIndex = null;
+  buffer = "";
   renderAll();
 }
 
@@ -160,7 +162,7 @@ function deleteForever(i) {
   renderTrash();
 }
 
-/* ---------- RENDER ---------- */
+/* ---------------------- RENDER ---------------------- */
 function renderTranscript() {
   output.textContent = buffer;
 }
@@ -208,13 +210,13 @@ function renderAll() {
   renderTrash();
 }
 
-/* ---------- COLLAPSE ---------- */
+/* ---------------------- COLLAPSIBLE ---------------------- */
 function toggleSection(id) {
   const el = document.getElementById(id);
   el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
-/* ---------- NEW NOTE ---------- */
+/* ---------------------- NEW NOTE ---------------------- */
 document.getElementById("newNote").onclick = () => {
   if (recording) {
     recording = false;
@@ -226,10 +228,10 @@ document.getElementById("newNote").onclick = () => {
   output.textContent = "";
 };
 
-/* ---------- EVENTS ---------- */
+/* ---------------------- EVENTS ---------------------- */
 recordBtn.onclick = toggleRecording;
 
-/* ---------- WATCHDOG for Polish ---------- */
+/* ---------------------- WATCHDOG for Polish or auto-restart ---------------------- */
 setInterval(() => {
   if (recording && Date.now() - lastSpeechTime > 7000) {
     try {
@@ -239,5 +241,5 @@ setInterval(() => {
   }
 }, 5000);
 
-/* ---------- INIT ---------- */
+/* ---------------------- INIT ---------------------- */
 renderAll();
