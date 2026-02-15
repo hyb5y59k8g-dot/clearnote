@@ -1,4 +1,3 @@
-/* ---------------------- VARIABLES ---------------------- */
 let recognition = null;
 let recording = false;
 let buffer = "";
@@ -16,20 +15,20 @@ const recordBtn = document.getElementById("recordBtn");
 const dot = document.getElementById("recordDot");
 const timerEl = document.getElementById("timer");
 
-/* ---------------------- STORAGE ---------------------- */
+/* -------- STORAGE -------- */
 const notes = () => JSON.parse(localStorage.getItem("notes") || "[]");
 const trash = () => JSON.parse(localStorage.getItem("trash") || "[]");
 const saveNotes = n => localStorage.setItem("notes", JSON.stringify(n));
 const saveTrash = t => localStorage.setItem("trash", JSON.stringify(t));
 
-/* ---------------------- TIMER ---------------------- */
+/* -------- TIMER -------- */
 function startTimer() {
   seconds = 0;
   timerEl.textContent = "00:00";
   timerInterval = setInterval(() => {
     seconds++;
-    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const s = String(seconds % 60).padStart(2, "0");
+    const m = String(Math.floor(seconds / 60)).padStart(2,"0");
+    const s = String(seconds % 60).padStart(2,"0");
     timerEl.textContent = `${m}:${s}`;
   }, 1000);
 }
@@ -38,47 +37,40 @@ function stopTimer() {
   clearInterval(timerInterval);
 }
 
-/* ---------------------- SPEECH RECOGNITION ---------------------- */
+/* -------- SPEECH RECOGNITION -------- */
 function initRecognition() {
   const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechAPI();
-
   recognition.lang = languageSelect.value || "en-US";
   recognition.continuous = true;
   recognition.interimResults = false;
 
   recognition.onresult = e => {
-    let textChunk = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        textChunk += e.results[i][0].transcript + " ";
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      if(e.results[i].isFinal){
+        buffer += e.results[i][0].transcript + " ";
+        lastSpeechTime = Date.now();
+        renderTranscript();
       }
-    }
-    if (textChunk) {
-      buffer += textChunk;
-      lastSpeechTime = Date.now();
-      renderTranscript();
     }
   };
 
   recognition.onend = () => {
-    if (recording) {
-      setTimeout(() => {
-        try { recognition.start(); } catch(e) {}
-      }, 500);
+    if(recording){
+      try { recognition.start(); } catch(e){}
     }
   };
 
   recognition.onerror = () => {
-    if (recording) {
-      try { recognition.start(); } catch(e) {}
+    if(recording){
+      try { recognition.start(); } catch(e){}
     }
   };
 }
 
-/* ---------------------- RECORD BUTTON ---------------------- */
-function toggleRecording() {
-  if (!recording) {
+/* -------- RECORD BUTTON -------- */
+function toggleRecording(){
+  if(!recording){
     buffer = "";
     initRecognition();
     recognition.start();
@@ -98,45 +90,41 @@ function toggleRecording() {
     recordBtn.classList.remove("recording");
     dot.classList.remove("recording");
 
-    if (buffer.trim()) persistNote();
+    if(buffer.trim()) persistNote();
   }
 }
 
-/* ---------------------- NOTES MANAGEMENT ---------------------- */
-function persistNote() {
+/* -------- NOTES MANAGEMENT -------- */
+function persistNote(){
   const all = notes();
-  all.push({
-    title: `Note ${new Date().toLocaleString()}`,
-    transcript: buffer
-  });
+  all.push({title: `Note ${new Date().toLocaleString()}`, transcript: buffer});
   saveNotes(all);
   activeIndex = null;
   buffer = "";
   renderAll();
 }
 
-function openNote(i) {
-  const all = notes();
+function openNote(i){
   activeIndex = i;
-  buffer = all[i].transcript;
+  buffer = notes()[i].transcript;
   renderTranscript();
   renderNotes();
 }
 
-function renameNote(i) {
+function renameNote(i){
+  const newName = prompt("Rename note:", notes()[i].title);
+  if(!newName) return;
   const all = notes();
-  const newName = prompt("Rename note:", all[i].title);
-  if (!newName) return;
   all[i].title = newName;
   saveNotes(all);
   renderNotes();
 }
 
-function deleteNote(i) {
+function deleteNote(i){
   const all = notes();
   const t = trash();
   t.push(all[i]);
-  all.splice(i, 1);
+  all.splice(i,1);
   saveNotes(all);
   saveTrash(t);
   activeIndex = null;
@@ -145,39 +133,34 @@ function deleteNote(i) {
   renderAll();
 }
 
-function restoreTrash(i) {
+function restoreTrash(i){
   const all = notes();
   const t = trash();
   all.push(t[i]);
-  t.splice(i, 1);
+  t.splice(i,1);
   saveNotes(all);
   saveTrash(t);
   renderAll();
 }
 
-function deleteForever(i) {
+function deleteForever(i){
   const t = trash();
-  t.splice(i, 1);
+  t.splice(i,1);
   saveTrash(t);
   renderTrash();
 }
 
-/* ---------------------- RENDER ---------------------- */
-function renderTranscript() {
-  output.textContent = buffer;
-}
+/* -------- RENDER -------- */
+function renderTranscript(){ output.textContent = buffer; }
 
-function renderNotes() {
+function renderNotes(){
   notesList.innerHTML = "";
   const all = notes();
-  if (!all.length) {
-    notesList.innerHTML = "<li>No saved notes</li>";
-    return;
-  }
-  all.forEach((n, i) => {
+  if(!all.length){ notesList.innerHTML="<li>No saved notes</li>"; return; }
+  all.forEach((n,i)=>{
     const li = document.createElement("li");
-    li.className = i === activeIndex ? "active" : "";
-    li.innerHTML = `
+    li.className = i===activeIndex ? "active" : "";
+    li.innerHTML=`
       <strong>${n.title}</strong><br>
       <button onclick="openNote(${i})">Open</button>
       <button onclick="renameNote(${i})">Edit</button>
@@ -187,16 +170,13 @@ function renderNotes() {
   });
 }
 
-function renderTrash() {
-  trashList.innerHTML = "";
+function renderTrash(){
+  trashList.innerHTML="";
   const t = trash();
-  if (!t.length) {
-    trashList.innerHTML = "<li>Trash is empty</li>";
-    return;
-  }
-  t.forEach((n, i) => {
+  if(!t.length){ trashList.innerHTML="<li>Trash is empty</li>"; return; }
+  t.forEach((n,i)=>{
     const li = document.createElement("li");
-    li.innerHTML = `
+    li.innerHTML=`
       <strong>${n.title}</strong><br>
       <button onclick="restoreTrash(${i})">Restore</button>
       <button onclick="deleteForever(${i})">Delete Forever</button>
@@ -205,41 +185,31 @@ function renderTrash() {
   });
 }
 
-function renderAll() {
-  renderNotes();
-  renderTrash();
-}
+function renderAll(){ renderNotes(); renderTrash(); }
 
-/* ---------------------- COLLAPSIBLE ---------------------- */
-function toggleSection(id) {
+/* -------- COLLAPSIBLE -------- */
+function toggleSection(id){
   const el = document.getElementById(id);
-  el.style.display = el.style.display === "none" ? "block" : "none";
+  el.classList.toggle("collapsed");
 }
 
-/* ---------------------- NEW NOTE ---------------------- */
-document.getElementById("newNote").onclick = () => {
-  if (recording) {
-    recording = false;
-    try { recognition.stop(); } catch(e) {}
-    stopTimer();
-  }
-  buffer = "";
-  activeIndex = null;
-  output.textContent = "";
+/* -------- NEW NOTE -------- */
+document.getElementById("newNote").onclick = ()=>{
+  if(recording){ recording=false; try{recognition.stop()}catch(e){} stopTimer(); }
+  buffer="";
+  activeIndex=null;
+  output.textContent="";
 };
 
-/* ---------------------- EVENTS ---------------------- */
+/* -------- EVENTS -------- */
 recordBtn.onclick = toggleRecording;
 
-/* ---------------------- WATCHDOG for Polish or auto-restart ---------------------- */
-setInterval(() => {
-  if (recording && Date.now() - lastSpeechTime > 7000) {
-    try {
-      recognition.stop();
-      recognition.start();
-    } catch(e) {}
+/* -------- WATCHDOG FOR SILENCE -------- */
+setInterval(()=>{
+  if(recording && Date.now()-lastSpeechTime>7000){
+    try{ recognition.stop(); recognition.start(); } catch(e){}
   }
-}, 5000);
+},5000);
 
-/* ---------------------- INIT ---------------------- */
+/* -------- INIT -------- */
 renderAll();
