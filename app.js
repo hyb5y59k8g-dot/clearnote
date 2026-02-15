@@ -4,6 +4,7 @@ let buffer = "";
 let activeIndex = null;
 let timerInterval = null;
 let seconds = 0;
+let lastSpeechTime = Date.now();
 
 const output = document.getElementById("output");
 const notesList = document.getElementById("notesList");
@@ -53,23 +54,24 @@ function initRecognition() {
         textChunk += e.results[i][0].transcript + " ";
       }
     }
-
     if (textChunk) {
       buffer += textChunk;
+      lastSpeechTime = Date.now();
       renderTranscript();
     }
   };
 
-  // Critical for Polish stability
   recognition.onend = () => {
     if (recording) {
-      recognition.start();
+      setTimeout(() => {
+        try { recognition.start(); } catch(e) {}
+      }, 500);
     }
   };
 
   recognition.onerror = () => {
     if (recording) {
-      recognition.start();
+      try { recognition.start(); } catch(e) {}
     }
   };
 }
@@ -77,7 +79,6 @@ function initRecognition() {
 /* ---------- RECORD TOGGLE ---------- */
 function toggleRecording() {
   if (!recording) {
-    // START
     buffer = "";
     initRecognition();
     recognition.start();
@@ -89,7 +90,6 @@ function toggleRecording() {
 
     startTimer();
   } else {
-    // STOP
     recording = false;
     recognition.stop();
     stopTimer();
@@ -105,12 +105,10 @@ function toggleRecording() {
 /* ---------- NOTES ---------- */
 function persistNote() {
   const all = notes();
-
   all.push({
     title: `Note ${new Date().toLocaleString()}`,
     transcript: buffer
   });
-
   saveNotes(all);
   activeIndex = null;
   renderAll();
@@ -136,27 +134,21 @@ function renameNote(i) {
 function deleteNote(i) {
   const all = notes();
   const t = trash();
-
   t.push(all[i]);
   all.splice(i, 1);
-
   saveNotes(all);
   saveTrash(t);
-
   activeIndex = null;
   buffer = "";
-  output.innerHTML = "";
-
+  output.textContent = "";
   renderAll();
 }
 
 function restoreTrash(i) {
   const all = notes();
   const t = trash();
-
   all.push(t[i]);
   t.splice(i, 1);
-
   saveNotes(all);
   saveTrash(t);
   renderAll();
@@ -177,23 +169,19 @@ function renderTranscript() {
 function renderNotes() {
   notesList.innerHTML = "";
   const all = notes();
-
   if (!all.length) {
     notesList.innerHTML = "<li>No saved notes</li>";
     return;
   }
-
   all.forEach((n, i) => {
     const li = document.createElement("li");
     li.className = i === activeIndex ? "active" : "";
-
     li.innerHTML = `
       <strong>${n.title}</strong><br>
       <button onclick="openNote(${i})">Open</button>
       <button onclick="renameNote(${i})">Edit</button>
       <button onclick="deleteNote(${i})">🗑</button>
     `;
-
     notesList.appendChild(li);
   });
 }
@@ -201,21 +189,17 @@ function renderNotes() {
 function renderTrash() {
   trashList.innerHTML = "";
   const t = trash();
-
   if (!t.length) {
     trashList.innerHTML = "<li>Trash is empty</li>";
     return;
   }
-
   t.forEach((n, i) => {
     const li = document.createElement("li");
-
     li.innerHTML = `
       <strong>${n.title}</strong><br>
       <button onclick="restoreTrash(${i})">Restore</button>
       <button onclick="deleteForever(${i})">Delete Forever</button>
     `;
-
     trashList.appendChild(li);
   });
 }
@@ -233,13 +217,28 @@ function toggleSection(id) {
 
 /* ---------- NEW NOTE ---------- */
 document.getElementById("newNote").onclick = () => {
+  if (recording) {
+    recording = false;
+    try { recognition.stop(); } catch(e) {}
+    stopTimer();
+  }
   buffer = "";
-  output.innerHTML = "";
   activeIndex = null;
+  output.textContent = "";
 };
 
 /* ---------- EVENTS ---------- */
 recordBtn.onclick = toggleRecording;
+
+/* ---------- WATCHDOG for Polish ---------- */
+setInterval(() => {
+  if (recording && Date.now() - lastSpeechTime > 7000) {
+    try {
+      recognition.stop();
+      recognition.start();
+    } catch(e) {}
+  }
+}, 5000);
 
 /* ---------- INIT ---------- */
 renderAll();
