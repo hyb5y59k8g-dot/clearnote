@@ -18,7 +18,6 @@ const timerEl = document.getElementById("timer");
 /* ---------- STORAGE ---------- */
 const notes = () => JSON.parse(localStorage.getItem("notes") || "[]");
 const trash = () => JSON.parse(localStorage.getItem("trash") || "[]");
-
 const saveNotes = n => localStorage.setItem("notes", JSON.stringify(n));
 const saveTrash = t => localStorage.setItem("trash", JSON.stringify(t));
 
