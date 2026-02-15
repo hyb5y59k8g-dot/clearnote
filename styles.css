@@ -53,12 +53,24 @@ button:active {
   transform: scale(0.98);
 }
 
+/* Apple-style primary button */
+button.primary {
+  background: #007aff;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 10px;
+}
+
+button.primary:hover {
+  background: #005bb5;
+}
+
+/* Record button */
 button.record-btn {
   font-weight: bold;
   width: 120px;
 }
 
-/* Active record button highlight */
 button.recording {
   background: #ff3b30 !important;
 }
@@ -70,6 +82,7 @@ button.recording {
   gap: 10px;
   font-weight: bold;
   margin-top: 4px;
+  flex-wrap: wrap; /* ensures timer + dot visible on small screens */
 }
 
 .dot {
@@ -89,7 +102,6 @@ button.recording {
   50% { opacity: 0; }
 }
 
-/* Timer styling */
 #timer {
   font-family: monospace;
   font-size: 14px;
@@ -130,6 +142,13 @@ ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+ul.collapsed {
+  max-height: 0;
 }
 
 li {
@@ -147,7 +166,6 @@ li.active {
   background: #d0ebff;
 }
 
-/* Buttons inside notes/trash */
 li button {
   margin-left: 6px;
   margin-top: 4px;
@@ -155,7 +173,7 @@ li button {
   padding: 4px 8px;
 }
 
-/* Responsive adjustments */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 500px) {
   .top-row {
     flex-direction: column;
