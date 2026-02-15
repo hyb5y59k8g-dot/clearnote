@@ -1,3 +1,4 @@
+/* ---------- BODY ---------- */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
@@ -5,38 +6,51 @@ body {
   background: #f9f9f9;
 }
 
+/* ---------- HEADER ---------- */
 header.header {
   position: sticky;
   top: 0;
   background: #fff;
-  padding: 10px;
+  padding: 12px;
   border-bottom: 1px solid #ccc;
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
+/* ---------- TOP CONTROLS ---------- */
 .top-row {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+  justify-content: flex-start;
+  gap: 12px;
 }
 
 .control label {
   margin-right: 5px;
+  font-weight: bold;
 }
 
+/* ---------- BUTTONS ---------- */
 button {
   cursor: pointer;
   border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 10px;
+  padding: 8px 14px;
   background: #007aff;
   color: #fff;
   font-size: 16px;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 button:hover {
   background: #005bb5;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 button.record-btn {
@@ -44,22 +58,24 @@ button.record-btn {
   width: 120px;
 }
 
+/* Active record button highlight */
 button.recording {
   background: #ff3b30 !important;
 }
 
+/* ---------- STATUS (dot + timer) ---------- */
 .status {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 5px;
   font-weight: bold;
+  margin-top: 4px;
 }
 
 .dot {
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background: #999;
   border-radius: 50%;
 }
@@ -73,39 +89,86 @@ button.recording {
   50% { opacity: 0; }
 }
 
+/* Timer styling */
+#timer {
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* ---------- MAIN PANELS ---------- */
 main {
-  padding: 10px;
+  padding: 12px;
 }
 
 .panel {
   background: #fff;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
+/* Collapsible headers */
+.collapsible {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ---------- TRANSCRIPT BOX ---------- */
 .box {
-  min-height: 60px;
+  min-height: 80px;
   background: #f2f2f2;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   white-space: pre-wrap;
   word-wrap: break-word;
+  font-size: 15px;
+}
+
+/* ---------- NOTES & TRASH LIST ---------- */
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 li {
-  margin-bottom: 5px;
-  padding: 5px;
+  margin-bottom: 6px;
+  padding: 6px 10px;
   background: #eaeaea;
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 li.active {
   background: #d0ebff;
 }
 
-.collapsible {
-  cursor: pointer;
-  user-select: none;
+/* Buttons inside notes/trash */
+li button {
+  margin-left: 6px;
+  margin-top: 4px;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+  .top-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  li button {
+    margin-left: 0;
+    margin-right: 4px;
+  }
 }
