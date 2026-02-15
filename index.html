@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>ClearNote</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- Added ?v=2 to force browser reload -->
-<link rel="stylesheet" href="styles.css?v=2" />
+  <meta charset="UTF-8" />
+  <title>ClearNote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Cache-busting query to force latest CSS -->
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 
 <body>
 
 <header class="header">
 
+  <!-- Top controls: New Note + Language -->
   <div class="top-row">
     <button id="newNote" class="primary">New Note</button>
 
@@ -24,6 +25,7 @@
     </div>
   </div>
 
+  <!-- Recorder button + timer + blinking dot -->
   <div class="recorder">
     <button id="recordBtn" class="record-btn">● Record</button>
     <div class="status">
@@ -36,22 +38,27 @@
 
 <main>
 
-<section class="panel">
-  <h3>Transcript</h3>
-  <div id="output" class="box"></div>
-</section>
+  <!-- Transcript section -->
+  <section class="panel">
+    <h3>Transcript</h3>
+    <div id="output" class="box"></div>
+  </section>
 
-<section class="panel">
-  <h3 class="collapsible" onclick="toggleSection('notesList')">Saved Notes</h3>
-  <ul id="notesList"></ul>
-</section>
+  <!-- Saved Notes collapsible -->
+  <section class="panel">
+    <h3 class="collapsible" onclick="toggleSection('notesList')">Saved Notes</h3>
+    <ul id="notesList"></ul>
+  </section>
 
-<section class="panel">
-  <h3 class="collapsible" onclick="toggleSection('trashList')">Trash</h3>
-  <ul id="trashList"></ul>
-</section>
+  <!-- Trash collapsible -->
+  <section class="panel">
+    <h3 class="collapsible" onclick="toggleSection('trashList')">Trash</h3>
+    <ul id="trashList"></ul>
+  </section>
 
-<!-- Added ?v=2 to force latest JS load -->
-<script src="app.js?v=2"></script>
+  <!-- Cache-busting query to force latest JS -->
+  <script src="app.js?v=3"></script>
+</main>
+
 </body>
 </html>
